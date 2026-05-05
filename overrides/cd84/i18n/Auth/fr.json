@@ -1,0 +1,13 @@
+{
+	"auth.charter": "/assets/cgu/Charte_ENT84.pdf",
+	"auth.title": "Edifice - Connexion ENT aucollege84, accès à votre espace scolaire",
+	"email.signature" : "L'équipe ENT",
+	"password.errors": "Choisissez 6 caractères minimum.",
+	"student":"Élève",
+	"otherstudent":"Élève",
+	"relative":"Responsable d'élèves",
+	"otherrelative":"Responsable d'élèves",
+	"otherteacher":"Personnel Éducation Nationale",
+	"loginperseducnat":"Personnel de la collectivité",
+	"loginother":"Invité"
+}

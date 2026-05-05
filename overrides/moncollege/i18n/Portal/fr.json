@@ -5,7 +5,6 @@
   "calendar": "Agenda",
   "actualites": "Actualités",
   "community": "Communautés",
-  "admin.xiti": "Paramétrage Xiti",
   "smartbanner.name": "NEO Pocket",
   "smartbanner.description": "Le réseau éducatif qui tient dans la poche !",
   "smartbanner.action": "Voir",
@@ -13,5 +12,6 @@
   "smartbanner.android.store": "Google Play",
   "smartbanner.android.uri": "https://play.google.com/store/apps/details?id=com.ode.neo",
   "smartbanner.ios.store": "App Store",
-  "smartbanner.ios.uri": "https://apps.apple.com/fr/app/neo-pocket/id1458097439"
+  "smartbanner.ios.uri": "https://apps.apple.com/fr/app/neo-pocket/id1458097439",
+  "disconnected.redirect.url": "https://www.moncollege-ent.essonne.fr/auth/saml/wayf"
 }
