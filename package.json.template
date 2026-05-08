@@ -43,5 +43,10 @@
     "sass": "^1.49.9",
     "entcore-generic-icons": "1.5.1"
   },
-  "files": ["dist"]
+  "files": ["dist"],
+  "pnpm": {
+    "overrides": {
+      "entcore-generic-icons": "1.5.1"
+    }
+  }
 }

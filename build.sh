@@ -19,7 +19,7 @@ case `uname -s` in
 esac
 
 # OVERRIDES VARS
-ITEMS=(default monlycee hdf paris moncollege na cg77 leo);
+ITEMS=(default monlycee hdf paris moncollege na cg77 leo cd16);
 OVERRIDE_NAME="default"
 for i in "$@"
 do
