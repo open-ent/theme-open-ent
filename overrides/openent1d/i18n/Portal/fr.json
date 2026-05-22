@@ -1,0 +1,19 @@
+{
+  "userBook.mood.angry": "concentré(e)",
+  "userBook.mood.default": "Non renseigné",
+  "userBook.mood.dreamy": "rêveur(se)",
+  "userBook.mood.happy": "content(e)",
+  "userBook.mood.joker": "rigolo(te)",
+  "userBook.mood.love": "inspiré(e)",
+  "userBook.mood.proud": "fier(fière)",
+  "userBook.mood.sad": "triste",
+  "userBook.mood.sick": "fatigué(e)",
+  "userBook.mood.tired": "stressé(e)",
+  "userBook.mood.worried": "inquiet(ète)",
+  "smartbanner.name": "Open ENT 1D",
+  "smartbanner.description": "Mon espace numérique de l'école !",
+  "smartbanner.action": "Voir",
+  "smartbanner.icon.uri": "/assets/themes/openent1d/img/illustrations/openent-smartphone.png",
+  "smartbanner.android.store": "Google Play",
+  "smartbanner.android.uri": "https://play.google.com/store/apps/details?id=fr.tech.openent"
+}

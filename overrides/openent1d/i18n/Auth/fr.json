@@ -1,0 +1,9 @@
+{
+	"auth.title": "Open ENT 1D - Accès à votre espace scolaire",
+	"password.errors": "Choisissez 8 caractères minimum, en mélangeant les majuscules et les minuscules.",
+	"email.signature": "L'équipe Open ENT",
+	"otherstudent": "Élève",
+	"otherrelative": "Parent ou responsable légal",
+	"otherperseducnat": "Enseignant ou personnel",
+	"loginother": "Invités"
+}

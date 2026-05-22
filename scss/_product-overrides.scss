@@ -1,0 +1,133 @@
+// ── Surcharges par produit (data-product sur <html>) ──────────────────────────
+//
+// Mécanisme : EdificeThemeProvider (React) lit theme-conf.js → bootstrapVersion
+// → split sur "-" → dernier segment → attribut data-product="xxx" sur <html>.
+//
+//   ode-bootstrap-one  →  data-product="one"   (2nd degré : collège / lycée)
+//   ode-bootstrap-neo  →  data-product="neo"   (neoconnect)
+//   ode-bootstrap-1d   →  data-product="1d"    (1er degré : école primaire)
+//
+// Usage : [data-product=1d] .monSelecteur { ... }
+// ──────────────────────────────────────────────────────────────────────────────
+
+// ── Produit 1D — École primaire ───────────────────────────────────────────────
+// Palette  : vert prairie #2BA84A (primary) · jaune soleil #FFCA28 (accent)
+// Police   : Comfortaa (ronde, lisible, adaptée aux enfants)
+// Principe : typographie plus grande, coins plus arrondis, couleurs chaudes
+
+[data-product="1d"] {
+
+  // ── Typographie : Comfortaa pour tout le portail ──────────────────────────
+  body,
+  .navbar,
+  .nav-link,
+  .btn,
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Comfortaa', 'Roboto', sans-serif;
+  }
+
+  // Titres un poil plus grands pour aérer la lecture
+  h1 { font-size: 1.9rem; }
+  h2 { font-size: 1.6rem; }
+  h3 { font-size: 1.35rem; }
+
+  // ── Navbar : fond vert prairie ────────────────────────────────────────────
+  .navbar {
+    background-color: #2BA84A;
+  }
+
+  // Lien actif / hover : soulignement jaune
+  .nav-link:hover,
+  .nav-link:focus {
+    color: #FFCA28 !important;
+  }
+
+  // ── Logo zone : espace légèrement plus généreux ───────────────────────────
+  .navbar-brand {
+    padding: 0.25rem 0;
+  }
+
+  // ── Boutons primaires : vert + coins très arrondis ────────────────────────
+  .btn-primary,
+  .btn-filled.btn-primary {
+    background-color: #2BA84A;
+    border-color: #2BA84A;
+    border-radius: 2rem;
+
+    &:hover,
+    &:focus {
+      background-color: #238A3D;
+      border-color: #238A3D;
+    }
+  }
+
+  // Bouton accent (ex. CTA page de connexion)
+  .btn-accent {
+    background-color: #FFCA28;
+    border-color: #FFCA28;
+    color: #333;
+    border-radius: 2rem;
+
+    &:hover {
+      background-color: #FFB81C;
+      border-color: #FFB81C;
+    }
+  }
+
+  // ── Liens ─────────────────────────────────────────────────────────────────
+  a {
+    color: #2BA84A;
+
+    &:hover {
+      color: #FF8C00;
+    }
+  }
+
+  // ── Cards / widgets : coins plus arrondis ─────────────────────────────────
+  .card,
+  .panel,
+  .widget-container {
+    border-radius: 1rem;
+  }
+
+  // ── Page de connexion (auth) ───────────────────────────────────────────────
+  // Bandeau du haut en vert primaire
+  .auth-header,
+  #login-form .form-title {
+    color: #2BA84A;
+  }
+
+  // Champ de saisie : bordure verte au focus
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: #2BA84A;
+    box-shadow: 0 0 0 0.2rem rgba(43, 168, 74, 0.25);
+  }
+
+  // ── Timeline / fil d'actualité ────────────────────────────────────────────
+  .timeline-header,
+  .notification-header {
+    border-left: 4px solid #2BA84A;
+  }
+
+  // ── Avatar / badge ────────────────────────────────────────────────────────
+  .avatar,
+  .user-avatar {
+    border: 2px solid #FFCA28;
+  }
+
+  // ── Pagination / active ───────────────────────────────────────────────────
+  .page-item.active .page-link {
+    background-color: #2BA84A;
+    border-color: #2BA84A;
+  }
+
+  .page-link {
+    color: #2BA84A;
+
+    &:hover {
+      color: #FF8C00;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+    "userBook.class.title": "Ma classe",
+	"userBook.mood.angry": "concentré(e)",
+    "userBook.mood.default": "Non renseigné",
+    "userBook.mood.dreamy": "rêveur(se)",
+    "userBook.mood.happy": "content(e)",
+    "userBook.mood.joker": "rigolo(te)",
+    "userBook.mood.love": "inspiré(e)",
+    "userBook.mood.proud": "fier(fière)",
+    "userBook.mood.sad": "triste",
+    "userBook.mood.sick": "fatigué(e)",
+    "userBook.mood.tired": "stressé(e)",
+    "userBook.mood.worried": "inquiet(ète)",
+    "wizard.files.details.option3" : "Si vous souhaitez importer des utilisateurs à partir de fichiers CSV, veuillez suivre les consignes suivantes :<br /><ul><li>Un fichier doit être constitué pour chaque profil (enseignants, élèves, parents, personnels).</li><li>Les fichiers doivent être enregistrés au format .csv (séparateur point-virgule).</li><li>Pour chaque fichier, les colonnes commençant par une majuscule sont obligatoires.</li></ul>",
+    "password.errors": "Choisissez 8 caractères minimum, en mélangeant les majuscules et les minuscules.",
+	"email.signature": "L'équipe Open ENT 1D"
+}
