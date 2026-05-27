@@ -26,7 +26,7 @@ Bonjour,<br/>
 <br/>
 Ceci est un mail généré automatiquement qui contient vos informations de connexion à Open ENT 1D.<br/>
 <br/>
-Vous possédez déjà un compte sur le réseau social collaboratif Open ENT 1D.<br/>
+Vous possédez déjà un compte sur le réseau social collaboratif Ent Scolaire Primaire.<br/>
 Votre identifiant de connexion est rappelé ci-contre : <i>{{login}}</i><br/>
 <br/>
 Si vous ne vous souvenez pas de votre mot de passe, vous pouvez en définir un nouveau en suivant les instructions ci-dessous :<br/>

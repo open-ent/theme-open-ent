@@ -4,7 +4,7 @@ Bonjour,<br/>
 <br/>
 Ceci est un mail généré automatiquement qui contient vos informations de première connexion à ENT16.<br/>
 <br/>
-La première connexion s’effectue sur <a href="https://mon-ent16.lacharente.fr">mon-ent16.lacharente.fr</a>.<br/>
+La première connexion s’effectue sur <a href="https://cd16.ent-scolaire.fr">cd16.ent-scolaire.fr</a>.<br/>
 <br/>
 Une première étape indispensable vous permettra de personnaliser vos informations de connexion.<br/>
 <br/>
@@ -17,7 +17,7 @@ Pour sécuriser vos accès, il vous sera demandé de choisir un nouveau de mot d
 <br/>
 Nous vous recommandons de mélanger chiffres, lettres, majuscules, minuscules et caractères spéciaux lors du choix de votre mot de passe personnel.<br/>
 <br/>
-Bonne navigation sur ENT16 !<br/>
+Bonne navigation sur ENT 16 !<br/>
 <br/>
 {{/activationCode}}
 {{! Users that are activated }}
@@ -31,7 +31,7 @@ Votre identifiant de connexion est rappelé ci-contre : <i>{{login}}</i><br/>
 <br/>
 Si vous ne vous souvenez pas de votre mot de passe, vous pouvez en définir un nouveau en suivant les instructions ci-dessous :<br/>
 <br/>
-- Rendez-vous à l’adresse <a href="https://mon-ent16.lacharente.fr">https://mon-ent16.lacharente.fr</a> et cliquez sur « Besoin d'aide? ».<br/>
+- Rendez-vous à l’adresse <a href="https://cd16.ent-scolaire.fr">https://cd16.ent-scolaire.fr</a> et cliquez sur « Besoin d'aide? ».<br/>
 <br/>
 - Cliquez ensuite sur "Vous avez perdu votre mot de passe ?", saisissez votre identifiant puis cliquez sur "Envoyer".<br/>
 <br/>
