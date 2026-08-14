@@ -45,8 +45,9 @@
 				display: inline-block;
 				vertical-align: middle;
 			}
+      /* Largeur calée sur le ratio 3,66:1 du logotype : ~60px de haut en A4. */
       #logo{
-				width: 150px;
+				width: 220px;
 			}
 			.baseline {
 				text-align: right;
@@ -78,8 +79,9 @@
 			.column img {
 				width: 50px;
 			}
+			/* A5 : ~44px de haut, proportionnel à la réduction du format. */
 			#logo {
-				width: 100px;
+				width: 160px;
 			}
 			{{/A5}}
 	</style>
@@ -91,7 +93,10 @@
 
 <div class="size"{{^end}} style="page-break-after: always"{{/end}}>
 	<div class="inline-block">
-		<img id="logo" src="logo.png"></img>
+		<!-- logo-text.png (1053x288) : le logotype horizontal. `logo.png` est la marque
+		     CARRÉE (200x206), pensée comme icône d'application : contrainte à la largeur
+		     ci-dessous, elle occupait un gros carré en tête de document. -->
+		<img id="logo" src="logo-text.png"></img>
 	</div>
 	{{^activationCode}}
 	<h2>Informations sur mon compte</h2>
