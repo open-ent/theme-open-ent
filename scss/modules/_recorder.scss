@@ -26,7 +26,7 @@
       color: $primary;
       @include run-transition(all);
       &:hover {
-        background-color: darken($primary, 10%);
+        background-color: darken($primary-base, 10%);
         color: white;
         @include run-transition(all);
       }

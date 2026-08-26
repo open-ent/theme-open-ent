@@ -6,7 +6,7 @@
     }
     &:hover {
       &::after {
-        background: lighten($primary, 20%);
+        background: lighten($primary-base, 20%);
       }
     }
   }
