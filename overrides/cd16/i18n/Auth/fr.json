@@ -1,6 +1,6 @@
 {
 	"auth.title": "Connexion ENT Charente, accès à votre espace scolaire",
-  	"password.errors": "Choisissez 8 caractères minimum, en mélangeant les majuscules et les minuscules.",
+  	"password.errors": "Choisissez 12 caractères minimum, avec au moins une minuscule, une majuscule et un chiffre.",
 	"email.signature": "L'équipe Open ENT",
 	"otherstudent":"Elève",
 	"otherrelative":"Collégiens - collégiennes - responsables légaux",

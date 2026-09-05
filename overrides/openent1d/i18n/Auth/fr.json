@@ -1,6 +1,8 @@
 {
+	"password.rules.reset": "Votre mot de passe doit contenir au moins 6 caractères. Il doit aussi être différent des précédents mots de passe déjà utilisés.",
+	"password.rules.activation": "Votre mot de passe doit contenir au moins 6 caractères.",
 	"auth.title": "Open ENT 1D - Accès à votre espace scolaire",
-	"password.errors": "Choisissez 8 caractères minimum, en mélangeant les majuscules et les minuscules.",
+	"password.errors": "Choisissez 6 caractères minimum.",
 	"email.signature": "L'équipe Open ENT",
 	"otherstudent": "Élève",
 	"otherrelative": "Parent ou responsable légal",
