@@ -1,0 +1,201 @@
+name: Theme release
+
+# Publie UN artefact par thème en GitHub Release. C'est le seul point de sortie des
+# thèmes depuis que le déploiement se fait en tirage : l'ENT télécharge lui-même
+# l'archive (init container sync-themes au démarrage, ThemeInstaller pour une
+# installation à chaud). Ce workflow ne connaît donc NI le cluster, NI de kubeconfig,
+# NI de registre d'images — il n'écrit que des Releases sur son propre dépôt.
+#
+# Il remplace open-ent-mods/.github/workflows/theme-publish.yml, qui reconstruisait
+# une image de 195 Mo pour un changement de couleur puis faisait `kubectl set image`
+# avec un `secrets.KUBE_CONFIG` : un workflow déclenchable par un ADML détenait un
+# accès en écriture à la production.
+#
+# Déclenchement nominal : le merge de la PR ouverte par l'éditeur de thème du
+# dashboard (GithubThemePublisher), qui ne touche que overrides/<skin>/.
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'overrides/**'
+      - 'scss/**'
+      - 'skins/**'
+      - 'assets/**'
+      - 'template/**'
+      - 'package-theme.sh'
+  workflow_dispatch:
+    inputs:
+      skins:
+        description: "Thèmes à publier, séparés par des espaces (vide = ceux qui ont changé ; 'all' = tous)"
+        required: false
+        type: string
+      version:
+        description: "Version à publier (vide = <base de package.json.template>-<numéro de run>)"
+        required: false
+        type: string
+
+permissions:
+  contents: write      # publier les Releases sur CE dépôt, et rien d'autre
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Quels thèmes reconstruire ? Un changement dans overrides/<skin>/ ne concerne
+  # que ce skin ; un changement dans scss/ ou skins/ est commun et les concerne tous.
+  # ---------------------------------------------------------------------------
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      skins: ${{ steps.pick.outputs.skins }}
+      version: ${{ steps.pick.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 2      # de quoi comparer le push à son parent
+
+      - id: pick
+        env:
+          INPUT_SKINS: ${{ inputs.skins }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          all_skins() { find ./overrides -maxdepth 1 -mindepth 1 -type d -printf '%f\n' | sort; }
+
+          if [ "${INPUT_SKINS:-}" = "all" ]; then
+            SELECTED=$(all_skins)
+          elif [ -n "${INPUT_SKINS:-}" ]; then
+            SELECTED=$(printf '%s\n' ${INPUT_SKINS})
+          else
+            CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" 2>/dev/null \
+                      || git diff --name-only HEAD~1 HEAD)
+            # Un fichier commun (scss/, skins/, assets/, template/) invalide tous les thèmes.
+            if printf '%s\n' "$CHANGED" | grep -qE '^(scss|skins|assets|template|package-theme\.sh)/'; then
+              SELECTED=$(all_skins)
+            else
+              SELECTED=$(printf '%s\n' "$CHANGED" | sed -n 's|^overrides/\([^/]*\)/.*|\1|p' | sort -u)
+            fi
+          fi
+
+          # Garde-fou : ne publier que des overrides réellement présents.
+          KEPT=""
+          for s in $SELECTED; do
+            if [ -d "./overrides/$s" ]; then KEPT="$KEPT $s"; else echo "::warning::override inconnu, ignoré : $s"; fi
+          done
+          KEPT=$(printf '%s\n' $KEPT | sort -u | tr '\n' ' ')
+
+          if [ -z "$(printf '%s' "$KEPT" | tr -d ' ')" ]; then
+            echo "Aucun thème à publier."
+            echo 'skins=[]' >> "$GITHUB_OUTPUT"
+          else
+            echo "Thèmes retenus :$KEPT"
+            printf 'skins=%s\n' "$(printf '%s\n' $KEPT | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -n "${INPUT_VERSION:-}" ]; then
+            VERSION="${INPUT_VERSION}"
+          else
+            # package.json.template porte "3.4.10-%branch%.%generateVersion%" : on en garde
+            # la base et on y adjoint le numéro de run, qui est monotone par dépôt.
+            BASE=$(grep -m1 '"version"' package.json.template | sed -E 's/.*"version"[^"]*"([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+            VERSION="${BASE}-${{ github.run_number }}"
+          fi
+          echo "Version : $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: select
+    if: needs.select.outputs.skins != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        skin: ${{ fromJson(needs.select.outputs.skins) }}
+    steps:
+      # build.sh attend entcore-css-lib en VOISIN du dépôt de thème : docker-compose.yml
+      # monte ../entcore-css-lib dans le container, et `initDev` réécrit la dépendance npm
+      # en `link:../entcore-css-lib/`. On reproduit donc cette disposition, ce qui évite
+      # aussi de dépendre d'un dist-tag npm `ode-csslib@<branche>` publié chez ODE.
+      - name: Checkout theme-open-ent
+        uses: actions/checkout@v6
+        with:
+          path: theme-open-ent
+
+      # Le GITHUB_TOKEN du workflow ne vaut que pour CE dépôt : si open-ent/entcore-css-lib
+      # est privé, il faut un jeton à portée lecture dessus (secret CSS_LIB_READ_TOKEN).
+      # Le `||` laisse le cas public fonctionner sans aucun secret à provisionner.
+      - name: Checkout entcore-css-lib
+        uses: actions/checkout@v6
+        with:
+          repository: open-ent/entcore-css-lib
+          ref: develop
+          path: entcore-css-lib
+          token: ${{ secrets.CSS_LIB_READ_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Construire entcore-css-lib
+        working-directory: entcore-css-lib
+        run: |
+          set -euo pipefail
+          sed "s/%generateVersion%/$(date +%Y%m%d%H%M)/" package.json.template > package.json
+          npm install --no-audit --no-fund
+          npm run release:build
+          # build.sh du thème recopie ce fichier en dist/version.txt du thème ;
+          # le paquet npm publié le porte, une construction depuis les sources non.
+          printf 'entcore-css-lib %s\n' "$(date +'%d/%m/%Y %H:%M:%S')" > dist/version.txt
+
+      - name: Préparer l'environnement attendu par build.sh
+        run: |
+          set -euo pipefail
+          # docker-compose.yml monte ces chemins ; absents, Docker les crée en root
+          # et pnpm échoue ensuite sur des droits qu'il n'a pas.
+          mkdir -p ~/.pnpm ~/.npm ~/.cache recette
+          touch ~/.gitconfig
+          # pnpm résout entcore-generic-icons en `github:` et exige un dépôt git valide.
+          git -C theme-open-ent rev-parse --git-dir >/dev/null
+
+      - name: Construire le thème ${{ matrix.skin }}
+        working-directory: theme-open-ent
+        run: |
+          set -euo pipefail
+          ./build.sh -o="${{ matrix.skin }}" initDev
+          ./build.sh -o="${{ matrix.skin }}" build
+
+      - name: Vérifier le résultat du build
+        working-directory: theme-open-ent
+        run: |
+          test -s dist/skins/default/theme.css \
+            || { echo "::error::dist/skins/default/theme.css absent ou vide pour ${{ matrix.skin }}"; exit 1; }
+
+      - name: Empaqueter l'artefact
+        working-directory: theme-open-ent
+        run: |
+          ./package-theme.sh \
+            --skin="${{ matrix.skin }}" \
+            --version="${{ needs.select.outputs.version }}" \
+            --out-dir="$GITHUB_WORKSPACE/artifacts"
+
+      # Un tag par thème ET par version : les thèmes évoluent indépendamment, et
+      # l'ENT épingle chacun le sien dans values.yaml. Pas de préfixe « v ».
+      - name: Publier la Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: theme-${{ matrix.skin }}-${{ needs.select.outputs.version }}
+          name: ${{ matrix.skin }} ${{ needs.select.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            Artefact de thème **${{ matrix.skin }}**, version `${{ needs.select.outputs.version }}`.
+
+            Installation depuis le dashboard (Configuration ENT → Personnalisation), ou en
+            épinglant la version dans `helm/openent-monolithe/values.yaml` :
+
+            ```yaml
+            themes:
+              pinned:
+                - { skin: ${{ matrix.skin }}, version: "${{ needs.select.outputs.version }}" }
+            ```
+
+            La somme de contrôle `.sha256` est vérifiée à l'installation ; l'archive est
+            construite de façon reproductible (`tar --sort=name`, horodatage figé).
+          files: |
+            artifacts/theme-${{ matrix.skin }}-${{ needs.select.outputs.version }}.tar.gz
+            artifacts/theme-${{ matrix.skin }}-${{ needs.select.outputs.version }}.tar.gz.sha256

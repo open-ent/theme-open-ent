@@ -96,7 +96,9 @@
 		<!-- logo-text.png (1053x288) : le logotype horizontal. `logo.png` est la marque
 		     CARRÉE (200x206), pensée comme icône d'application : contrainte à la largeur
 		     ci-dessous, elle occupait un gros carré en tête de document. -->
-		<img id="logo" src="logo-text.png"></img>
+		<!-- Logo de l'établissement s'il en a déposé un (branding par structure, StructureBrandingService) ; sinon logo du thème, comme auparavant. -->
+		{{#branding.logoUrl}}<img id="logo" src="{{branding.logoUrl}}"></img>{{/branding.logoUrl}}
+		{{^branding.logoUrl}}<img id="logo" src="logo-text.png"></img>{{/branding.logoUrl}}
 	</div>
 	{{^activationCode}}
 	<h2>Informations sur mon compte</h2>
