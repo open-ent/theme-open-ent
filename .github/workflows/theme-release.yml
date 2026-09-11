@@ -135,8 +135,12 @@ jobs:
       # entcore-css-lib n'a pas de packageManager/lockfile figé mais ses scripts
       # (release:prepare, sass:build:release…) shellent tous vers `pnpm` : sans ce
       # setup, `npm run release:build` échoue en "pnpm: not found" (exit 127).
+      # L'action ne devine la version que depuis un champ packageManager absent ici :
+      # il faut la fixer explicitement, sinon "No pnpm version is specified".
       - name: Installer pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Construire entcore-css-lib
         working-directory: entcore-css-lib
