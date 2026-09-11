@@ -132,6 +132,12 @@ jobs:
           path: entcore-css-lib
           token: ${{ secrets.CSS_LIB_READ_TOKEN || secrets.GITHUB_TOKEN }}
 
+      # entcore-css-lib n'a pas de packageManager/lockfile figé mais ses scripts
+      # (release:prepare, sass:build:release…) shellent tous vers `pnpm` : sans ce
+      # setup, `npm run release:build` échoue en "pnpm: not found" (exit 127).
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Construire entcore-css-lib
         working-directory: entcore-css-lib
         run: |
