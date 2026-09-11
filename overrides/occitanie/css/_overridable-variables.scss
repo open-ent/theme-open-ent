@@ -1,0 +1,9 @@
+// Charte graphique « mon ENT Occitanie »
+// Relevée sur le portail de référence (feuille portail/entmip) :
+//   Primary : bleu-canard  #017FAD  — liens, nom du site, bouton de connexion
+//   Accent  : magenta      #D00053  — barre de navigation, titres d'encadrés, pied de page
+//   (#015A7A est le survol du primaire ; il se dérive, on ne le fixe pas ici)
+
+$primary: #017FAD;
+$accent:  #D00053;
+$hover:   $accent;

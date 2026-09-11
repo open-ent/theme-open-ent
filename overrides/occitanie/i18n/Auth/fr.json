@@ -1,0 +1,9 @@
+{
+	"auth.title": "mon ENT Occitanie - Accès à votre espace scolaire",
+  	"password.errors": "Choisissez 12 caractères minimum, avec au moins une minuscule, une majuscule et un chiffre.",
+	"email.signature": "L'équipe mon ENT Occitanie",
+	"otherstudent":"Elève",
+	"otherrelative":"Collégiens - collégiennes - responsables légaux",
+	"otherperseducnat":"Personnel Education Nationale",
+	"loginother":"Invités"
+}
