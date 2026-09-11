@@ -86,7 +86,9 @@
         {{#users}}
         <div class="card">
             <div class="identity">
-                <img class="logo" src="logo.png"></img>
+                <!-- Logo de l'établissement s'il en a déposé un (branding par structure, StructureBrandingService) ; sinon logo du thème, comme auparavant. -->
+                {{#branding.logoUrl}}<img class="logo" src="{{branding.logoUrl}}"></img>{{/branding.logoUrl}}
+                {{^branding.logoUrl}}<img class="logo" src="logo.png"></img>{{/branding.logoUrl}}
                 <h2 class="name truncated">{{displayName}}</h2>
                 {{^isGuestOrPersonnel}}
                 <strong class="grade truncated">{{#i18n}}{{profile}}{{/i18n}}{{#firstClass}} {{#i18n}}classAdmin.template.class{{/i18n}} <strong>{{.}}</strong>{{#otherClasses}}, <strong>{{.}}</strong>{{/otherClasses}}{{/firstClass}}.</strong>

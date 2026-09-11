@@ -28,15 +28,26 @@ $shadow-dark:                 rgba(0, 0, 0, 0.4) !default;
 $shadow-darker:               rgba(0, 0, 0, 0.6) !default;
 
 ///////
-$primary:                     $cyan !default;
-$primary-darkest:             saturate(darken($primary, 40%), 10%) !default;          //#0c3848
-$primary-dark:                saturate(darken($primary, 9%), 3%) !default;            //#2a9cc8
-$primary-light:               saturate(lighten($primary, 17%), 85%) !default;         //#97defa
+// D9 (AO ENT ÉCLAT-BFC, personnalisation graphique par établissement) : $primary/$accent restent la
+// couleur statique par défaut (build) MAIS deviennent aussi surchargeables au RUNTIME via une CSS custom
+// property (fallback = valeur par défaut si non définie, donc rétrocompatible, aucun changement visuel
+// tant que rien ne définit --custom-primary/--custom-accent). $primary-base/$accent-base restent les
+// couleurs statiques (nécessaires pour les fonctions SCSS darken()/lighten()/saturate(), qui ne peuvent
+// pas s'appliquer à une expression CSS var() calculée au runtime) : les teintes dérivées ci-dessous et les
+// quelques usages ponctuels de darken($primary,...)/lighten($primary,...) ailleurs dans ce thème
+// (cf. header, panel, indicator, tabs, recorder, widgets, pages) référencent délibérément *-base, pas la
+// variable runtime — limite assumée, ces teintes dérivées ne suivent pas la surcharge au runtime.
+$primary-base:                $cyan !default;
+$primary:                     var(--custom-primary, $primary-base) !default;
+$primary-darkest:             saturate(darken($primary-base, 40%), 10%) !default;     //#0c3848
+$primary-dark:                saturate(darken($primary-base, 9%), 3%) !default;       //#2a9cc8
+$primary-light:               saturate(lighten($primary-base, 17%), 85%) !default;    //#97defa
 $primary-lighter:             desaturate(lighten($primary-light, 15%), 10%) !default; //#c7edfc
 
-$accent:                      $orange !default;
+$accent-base:                 $orange !default;
+$accent:                      var(--custom-accent, $accent-base) !default;
 $hover: 		                  $accent !default;
-$dark-accent:                 darken($accent, 15%) !default;                          //#b35d00
+$dark-accent:                 darken($accent-base, 15%) !default;                     //#b35d00
 
 $warning-color:               $pink !default;
 $warning-color-hover:         darken($warning-color, 20%) !default;

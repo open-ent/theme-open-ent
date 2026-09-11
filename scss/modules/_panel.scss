@@ -168,7 +168,15 @@
         &.forgot-link {
           font-size: 18px;
           margin: 0;
+          // RGAA 51H (contraste) — variante foncée AA : chaque skin assombrit SA couleur primaire
+          // (le texte coloré de marque sur fond blanc n'atteignait pas 4.5:1). Structurel = tous skins.
+          color: darken($primary-base, 18%);
         }
+      }
+      // RGAA 51H (contraste) — bouton de connexion : texte foncé (le fond accent, clair sur la
+      // plupart des skins, échouait avec du texte blanc). Identité de marque (fond) préservée.
+      button {
+        color: #1a1a1a;
       }
     }
     .welcome-text + form {

@@ -1,0 +1,20 @@
+{
+	"userBook.mood.angry": "concentrado(a)",
+	"userBook.mood.default": "No especificado",
+	"userBook.mood.dreamy": "nervioso(a)",
+	"userBook.mood.happy": "feliz",
+	"userBook.mood.joker": "decidido(a)",
+	"userBook.mood.love": "inspirado(a)",
+	"userBook.mood.proud": "sereno(a)",
+	"userBook.mood.sad": "distraído(a)",
+	"userBook.mood.sick": "impaciente",
+	"userBook.mood.tired": "estresado(a)",
+	"userBook.mood.worried": "preocupado(a)",
+	"smartbanner.name": "NEO Pocket",
+	"smartbanner.description": "¡Lo esencial de Open ENT al alcance de la mano!",
+	"smartbanner.action": "Ver",
+	"smartbanner.icon.uri": "/assets/themes/openent3/img/illustrations/openent-smartphone.png",
+	"smartbanner.android.store": "Google Play",
+	"smartbanner.android.uri": "https://play.google.com/store/apps/details?id=fr.tech.openent"
+
+}

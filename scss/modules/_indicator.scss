@@ -62,7 +62,7 @@
       }
       &:hover {
         background-color: mix(
-          lighten($primary, 30%),
+          lighten($primary-base, 30%),
           $lightest-grey
         ) !important;
         i.connection-by-visitors-icon {
@@ -114,11 +114,11 @@
       &:hover {
         color: $darkest-grey;
         background-color: mix(
-          lighten($primary, 30%),
+          lighten($primary-base, 30%),
           $lightest-grey
         ) !important;
         h1 {
-          color: darken($primary, 10%);
+          color: darken($primary-base, 10%);
         }
       }
       &.selected {
@@ -128,7 +128,7 @@
           color: $white;
         }
         &:hover {
-          background-color: darken($primary, 5%) !important;
+          background-color: darken($primary-base, 5%) !important;
         }
       }
     }

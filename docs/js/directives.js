@@ -25,7 +25,7 @@ var addDirectives = function (module, done) {
       replace: false,
       template:
         '<input type="password" autocomplete="off"/>' +
-        '<button type="button" ng-class="{ pushed: toggle }" ng-click="show(!toggle)"></button>',
+        '<button type="button" ng-class="{ pushed: toggle }" ng-click="show(!toggle)" aria-label="Afficher ou masquer le mot de passe"></button>',
       scope: true,
       compile: function (element, attributes) {
         element.addClass("toggleable-password");

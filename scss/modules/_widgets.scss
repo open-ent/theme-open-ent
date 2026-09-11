@@ -564,7 +564,7 @@
       @include run-transition(all);
       &:hover {
         @include run-transition(all);
-        background-color: rgba($primary, 0.1);
+        background-color: rgba($primary-base, 0.1);
         color: $primary;
       }
     }

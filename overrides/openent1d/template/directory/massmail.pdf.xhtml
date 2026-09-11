@@ -91,7 +91,9 @@
 
 <div class="size"{{^end}} style="page-break-after: always"{{/end}}>
 	<div class="inline-block">
-		<img id="logo" src="logo.png"></img>
+		<!-- Logo de l'établissement s'il en a déposé un (branding par structure, StructureBrandingService) ; sinon logo du thème, comme auparavant. -->
+		{{#branding.logoUrl}}<img id="logo" src="{{branding.logoUrl}}"></img>{{/branding.logoUrl}}
+		{{^branding.logoUrl}}<img id="logo" src="logo.png"></img>{{/branding.logoUrl}}
 	</div>
 	{{^activationCode}}
 	<h2>Informations sur mon compte</h2>
