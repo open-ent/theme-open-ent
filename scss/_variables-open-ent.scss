@@ -37,15 +37,30 @@ $shadow-darker:               rgba(0, 0, 0, 0.6) !default;
 // quelques usages ponctuels de darken($primary,...)/lighten($primary,...) ailleurs dans ce thème
 // (cf. header, panel, indicator, tabs, recorder, widgets, pages) référencent délibérément *-base, pas la
 // variable runtime — limite assumée, ces teintes dérivées ne suivent pas la surcharge au runtime.
-$primary-base:                $cyan !default;
-$primary:                     var(--custom-primary, $primary-base) !default;
-$primary-darkest:             saturate(darken($primary-base, 40%), 10%) !default;     //#0c3848
+// `_overridable-variables` (surcharge du thème, importé juste avant) pose $primary/$accent en
+// couleur LITTÉRALE. C'est cette couleur-là qui est la marque : *-base doit en partir, sinon
+// toutes les teintes dérivées ci-dessous restent celles du thème par défaut (cyan/orange) —
+// le dégradé du bandeau partait ainsi de la couleur du déploiement pour finir en cyan #36a6d0,
+// quel que soit le thème. D'où la capture AVANT la réécriture de $primary en var().
+$primary-base:                if(variable-exists(primary), $primary, $cyan) !default;
+// Pas de `!default` : $primary vient d'être posé par la surcharge, il faut le réécrire pour
+// rendre la couleur surchargeable au runtime — sa valeur littérale est déjà sauvée dans -base.
+$primary:                     var(--custom-primary, $primary-base);
+// Teintes visées par une CLARTÉ FIXE, pas par un décalage relatif.
+// Les formules d'origine (`lighten(.., 17%)` + `saturate(.., 85%)`) étaient calibrées sur le
+// cyan pâle et peu saturé qui servait de base à tous les thèmes. Dès que la base devient la
+// couleur de marque, un décalage relatif ne tient plus : sur un magenta déjà sombre et saturé,
+// `lighten(+17%)` reste à 49 % de clarté et `saturate(+85%)` plafonne à 100 % → #f800b5, un
+// rose fluo en fond de liste ; et `darken(-40%)` tombe purement et simplement à `black`.
+// Fixer la clarté cible donne une teinte de même rôle quelle que soit la marque, et laisse le
+// cyan d'origine quasi inchangé (#78daff → #7ed5f6, #c7edfc → #c9ebf8).
+$primary-darkest:             change-color(saturate($primary-base, 10%), $lightness: 16%) !default;
 $primary-dark:                saturate(darken($primary-base, 9%), 3%) !default;       //#2a9cc8
-$primary-light:               saturate(lighten($primary-base, 17%), 85%) !default;    //#97defa
-$primary-lighter:             desaturate(lighten($primary-light, 15%), 10%) !default; //#c7edfc
+$primary-light:               change-color(saturate($primary-base, 25%), $lightness: 73%) !default;
+$primary-lighter:             desaturate(change-color($primary-light, $lightness: 88%), 10%) !default;
 
-$accent-base:                 $orange !default;
-$accent:                      var(--custom-accent, $accent-base) !default;
+$accent-base:                 if(variable-exists(accent), $accent, $orange) !default;
+$accent:                      var(--custom-accent, $accent-base);
 $hover: 		                  $accent !default;
 $dark-accent:                 darken($accent-base, 15%) !default;                     //#b35d00
 
