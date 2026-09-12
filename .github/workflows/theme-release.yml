@@ -51,7 +51,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 2      # de quoi comparer le push à son parent
+          # 0 = historique complet. `fetch-depth: 2` ne suffisait que pour un push d'UN
+          # commit : sur un push de deux commits ou plus, `github.event.before` n'est pas
+          # dans le clone, `git diff` échoue et le repli `HEAD~1 HEAD` ne voit que le
+          # dernier commit. Un changement commun (scss/) poussé avec un autre commit
+          # passait ainsi inaperçu et seuls les thèmes du dernier commit étaient republiés.
+          fetch-depth: 0
 
       - id: pick
         env:
@@ -67,10 +72,20 @@ jobs:
           elif [ -n "${INPUT_SKINS:-}" ]; then
             SELECTED=$(printf '%s\n' ${INPUT_SKINS})
           else
-            CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" 2>/dev/null \
-                      || git diff --name-only HEAD~1 HEAD)
-            # Un fichier commun (scss/, skins/, assets/, template/) invalide tous les thèmes.
-            if printf '%s\n' "$CHANGED" | grep -qE '^(scss|skins|assets|template|package-theme\.sh)/'; then
+            BEFORE="${{ github.event.before }}"
+            # Un premier push de branche donne 0000…0, et `before` peut aussi avoir été
+            # élagué : on ne retombe sur le dernier commit que s'il est vraiment inutilisable,
+            # et bruyamment — c'est un repli qui republie trop peu, pas trop.
+            if [ -n "$BEFORE" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+              CHANGED=$(git diff --name-only "$BEFORE" "${{ github.sha }}")
+            else
+              echo "::warning::commit de départ ($BEFORE) introuvable — sélection réduite au dernier commit"
+              CHANGED=$(git diff --name-only HEAD~1 HEAD)
+            fi
+            # Un fichier commun (scss/, skins/, assets/, template/, package-theme.sh)
+            # invalide tous les thèmes. `package-theme.sh` est un FICHIER : le `/` final du
+            # groupe ne pouvait jamais lui correspondre, il est donc alterné à part.
+            if printf '%s\n' "$CHANGED" | grep -qE '^((scss|skins|assets|template)/|package-theme\.sh$)'; then
               SELECTED=$(all_skins)
             else
               SELECTED=$(printf '%s\n' "$CHANGED" | sed -n 's|^overrides/\([^/]*\)/.*|\1|p' | sort -u)
