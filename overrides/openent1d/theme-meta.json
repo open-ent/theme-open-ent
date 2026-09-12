@@ -1,0 +1,5 @@
+{
+  "_comment": "Gabarit front porté par l'artefact, repris dans theme.json puis dans theme-conf.js par l'installateur. Sans lui, un thème 1d serait déclaré en 2d et les applications React poseraient data-product=neo.",
+  "bootstrapVersion": "ode-bootstrap-1d",
+  "help": "/help-1d"
+}

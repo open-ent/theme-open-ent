@@ -73,6 +73,20 @@ if [[ -d "$SCRIPT_DIR/assets/i18n" ]]; then
     cp -a "$SCRIPT_DIR/assets/i18n/." "$STAGE/i18n/"
 fi
 
+# Métadonnées de conf front : le skin doit figurer dans `theme-conf.js` pour que les
+# applications React posent data-theme/data-product — absent de cette liste, le front
+# écrit littéralement data-theme="undefined" et perd son thème (constaté sur occitanie).
+# L'artefact les transporte donc, et l'installateur complète `theme-conf.js` tout seul.
+# `theme-meta.json` de l'override fait foi ; à défaut, le gabarit 2d, le plus courant.
+BOOTSTRAP_VERSION="ode-bootstrap-neo"
+HELP_PATH="/help-2d"
+META_FILE="$SCRIPT_DIR/overrides/$SKIN/theme-meta.json"
+if [[ -f "$META_FILE" ]]; then
+    value_of() { sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" "$META_FILE" | head -1; }
+    [[ -n "$(value_of bootstrapVersion)" ]] && BOOTSTRAP_VERSION="$(value_of bootstrapVersion)"
+    [[ -n "$(value_of help)" ]] && HELP_PATH="$(value_of help)"
+fi
+
 SKINS_JSON="[]"
 if [[ -d "$DIST_DIR/skins" ]]; then
     SKINS_JSON="$(find "$DIST_DIR/skins" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
@@ -91,6 +105,8 @@ cat > "$STAGE/theme.json" <<JSON
   "skin": "$SKIN",
   "version": "$VERSION",
   "themeOpenEntSha": "$THEME_SHA",
+  "bootstrapVersion": "$BOOTSTRAP_VERSION",
+  "help": "$HELP_PATH",
   "skins": $SKINS_JSON
 }
 JSON
