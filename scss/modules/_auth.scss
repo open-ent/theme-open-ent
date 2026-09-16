@@ -1,0 +1,807 @@
+// =============================================================================
+// Écrans d'authentification (connexion / identifiant oublié)
+// -----------------------------------------------------------------------------
+// Portée : `body.auth-page` uniquement — classe posée par auth/view-src/login.html
+// et auth/view-src/forgot.html. Les autres pages qui partagent `body.login`
+// (activation, revalidation des CGU) ne sont PAS touchées.
+//
+// Les couleurs dérivent de `$primary-base` / `$accent-base` (valeurs littérales) :
+// les teintes calculées ne peuvent pas partir de `$primary`, qui est une var() CSS
+// résolue au runtime (cf. _variables-open-ent.scss).
+// =============================================================================
+
+// Couleur du texte du bouton principal. Le fond reste la couleur accent du skin,
+// qui va du jaune clair (openent3 #FFB300) au vert foncé (cd16 #006C47) : un
+// texte figé échouait d'un côté ou de l'autre du contraste RGAA 51H. On tranche
+// sur la clarté de l'accent — la valeur littérale, `$accent` étant une var() CSS.
+$auth-button-color: if(lightness($accent-base) >= 40%, #1a1a1a, $white);
+
+$auth-card-radius: 16px;
+$auth-field-radius: 10px;
+$auth-card-width: 27rem; // 432px
+$auth-wide-width: 40rem; // 640px
+
+@mixin auth-backdrop {
+  background-color: $primary-darkest;
+  background-image: radial-gradient(
+      70rem 35rem at 12% -15%,
+      rgba(255, 255, 255, 0.22),
+      transparent 60%
+    ),
+    radial-gradient(
+      55rem 30rem at 100% 105%,
+      rgba(0, 0, 0, 0.28),
+      transparent 55%
+    ),
+    linear-gradient(
+      158deg,
+      $primary-base 0%,
+      $primary-dark 52%,
+      $primary-darkest 100%
+    );
+  background-attachment: fixed;
+}
+
+body.auth-page {
+  min-height: 100vh;
+  @include auth-backdrop;
+
+  // ---- Neutralisation de l'empilement absolu hérité ------------------------
+  // Le gabarit historique empile `div.absolute` + `.panel{position:absolute;
+  // height:256px}` : un bandeau de 256 px surmontant une zone grise vide qui
+  // occupait le reste de l'écran. On repasse toute la chaîne en flux normal
+  // pour centrer la carte dans la fenêtre.
+  > default-styles {
+    display: block;
+  }
+
+  .absolute {
+    position: static;
+    height: auto;
+    width: auto;
+  }
+
+  .centered.container.row {
+    display: block;
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+
+  section.main {
+    display: block;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .panel {
+    position: static;
+    height: auto;
+    min-height: 100vh;
+    width: auto;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 3rem 1rem 3.5rem;
+    gap: 0;
+    @include auth-backdrop;
+  }
+
+  // ---- Logo : remis dans le flux, centré au-dessus de la carte -------------
+  .panel > .logo {
+    position: static;
+    display: block;
+    height: 4rem;
+    max-width: min(17.5rem, 72vw);
+    object-fit: contain;
+    object-position: center;
+    margin: 0 auto 1.25rem !important;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+  }
+
+  // ---- Titre ---------------------------------------------------------------
+  // `> h1` ne suffit pas : forgot-teacher-request-form.html emboîte son titre
+  // dans un `div` intermédiaire.
+  .panel h1 {
+    color: $white;
+    width: auto;
+    max-width: 100%;
+    margin: 0 0 1.75rem;
+    font-size: clamp(1.5rem, 1rem + 2.2vw, 2.25rem);
+    line-height: 1.2;
+    font-weight: 700;
+    text-align: center;
+    text-wrap: balance;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  }
+
+  // Les titres situés DANS une carte restent des titres de contenu.
+  .panel .content h1,
+  .panel .welcome-text h1,
+  .panel form h1 {
+    margin: 0 0 1rem;
+    font-size: 1.375rem;
+    color: $darkest-grey;
+    text-align: left;
+    text-shadow: none;
+  }
+
+  // Texte d'introduction posé hors carte (sur le fond de marque).
+  .panel > p:not(.warning):not(.error),
+  .panel
+    > div:not(.panels-container):not(.content):not(.welcome-text):not(.browser)
+    > p:not(.warning):not(.error) {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: $auth-wide-width;
+    margin: 0 0 1.5rem;
+    font-size: 1rem;
+    line-height: 1.55;
+    text-align: center;
+    text-wrap: pretty;
+    color: $white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  }
+
+  // Gabarits qui regroupent titre + formulaire dans un div intermédiaire.
+  .panel
+    > div:not(.panels-container):not(.content):not(.welcome-text):not(.browser) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  // ---- Carte ---------------------------------------------------------------
+  .panel form:not(.nostyle),
+  .panel .content,
+  .panel .welcome-text,
+  .panel .browser,
+  .panel .teacher-request-sent {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: $auth-card-width;
+    // `_panel.scss` pose min-width: 40% / min-height: 345px sur les cartes de
+    // connexion et d'activation : un min-width l'emporte sur le max-width.
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 2rem;
+    background: $white;
+    border-radius: $auth-card-radius;
+    box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.22),
+      0 0.125rem 0.375rem rgba(0, 0, 0, 0.08);
+  }
+
+  .panel .content,
+  .panel .browser {
+    max-width: $auth-wide-width;
+  }
+
+  .panel .teacher-request-sent {
+    text-align: center;
+
+    h1 {
+      text-align: center;
+    }
+
+    p {
+      margin: 0 0 1.5rem;
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      color: $dark-grey;
+    }
+  }
+
+  // ---- Champs --------------------------------------------------------------
+  .panel {
+    label {
+      display: block;
+      width: auto;
+      margin: 0 0 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $darkest-grey;
+      float: none;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    select {
+      box-sizing: border-box;
+      width: 100%;
+      height: auto;
+      min-height: 2.875rem;
+      margin: 0;
+      padding: 0.6875rem 0.875rem;
+      float: none;
+      font-size: 1rem;
+      color: $text-color;
+      background: $white;
+      border: 1px solid $neutral-grey;
+      border-radius: $auth-field-radius;
+      box-shadow: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+      &:hover {
+        border-color: $solid-grey;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: darken($primary-base, 10%);
+        box-shadow: 0 0 0 3px rgba($primary-base, 0.28);
+      }
+
+      &.ng-invalid.ng-dirty {
+        border: 1px solid $red;
+        box-shadow: 0 0 0 3px rgba($red, 0.2);
+      }
+    }
+
+    select {
+      appearance: none;
+      padding-right: 2.25rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6472' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1.125rem;
+    }
+
+    form p {
+      margin: 0 0 1.125rem;
+    }
+  }
+
+  // ---- Case à cocher « se souvenir de moi » --------------------------------
+  // Le thème masque la case native et dessine la boîte sur `small::before`
+  // (cf. modules/_checkboxes-custom.scss). On garde le principe, mais la case
+  // reste focalisable au clavier et prend la couleur de marque une fois cochée.
+  .panel form > label {
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: visible;
+    margin: 0 0 1.25rem;
+    font-weight: 400;
+    color: $dark-grey;
+    cursor: pointer;
+
+    input:is([type="checkbox"], #rememberMe) {
+      // `_checkboxes-custom.scss` la met en `display: none` : elle sort alors du
+      // parcours clavier. On la garde dans le flux, rendue invisible, pour que
+      // Tab et l'indicateur de focus fonctionnent.
+      display: block;
+      position: absolute;
+      left: 0;
+      width: 1.25rem;
+      height: 1.25rem;
+      min-height: 0;
+      margin: 0;
+      opacity: 0;
+    }
+
+    input:is([type="checkbox"], #rememberMe) + small {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.625rem;
+      font-size: 0.875rem;
+      line-height: 1.4;
+
+      &::before {
+        content: "";
+        flex: 0 0 auto;
+        box-sizing: border-box;
+        width: 1.25rem;
+        height: 1.25rem;
+        margin: 0;
+        border: 2px solid $solid-grey;
+        border-radius: 5px;
+        background: $white center / 0.8125rem no-repeat;
+        transform: none;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+      }
+    }
+
+    input:is([type="checkbox"], #rememberMe):checked + small::before {
+      width: 1.25rem;
+      height: 1.25rem;
+      margin: 0;
+      transform: none;
+      border-color: darken($primary-base, 10%);
+      background-color: darken($primary-base, 10%);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    }
+
+    input:is([type="checkbox"], #rememberMe):focus-visible + small::before {
+      border-color: darken($primary-base, 10%);
+      box-shadow: 0 0 0 3px rgba($primary-base, 0.3);
+    }
+
+    &:hover
+      input:is([type="checkbox"], #rememberMe):not(:checked)
+      + small::before {
+      border-color: $grey;
+    }
+  }
+
+  // ---- Boutons -------------------------------------------------------------
+  // Fond accent + texte choisi selon la clarté de l'accent (cf. $auth-button-color).
+  .panel form button,
+  .panel form input[type="submit"] {
+    display: inline-block;
+    box-sizing: border-box;
+    height: auto;
+    margin: 0;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    color: $auth-button-color;
+    background: $accent;
+    border: none;
+    border-radius: $auth-field-radius;
+    box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.18);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.15s ease,
+      background-color 0.15s ease;
+
+    &:hover {
+      color: $auth-button-color;
+      background: $dark-accent;
+      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.24);
+    }
+
+    &:active {
+      transform: translateY(1px);
+      box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.2);
+    }
+
+    &:focus-visible {
+      outline: 3px solid $white;
+      outline-offset: 2px;
+    }
+
+    &[disabled="disabled"],
+    &:disabled {
+      color: $dark-grey;
+      background: $light-grey;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+  }
+
+  // ---- Champ mot de passe (input-password) ---------------------------------
+  // Le bouton « voir » était une pastille pleine posée à côté du champ, qui
+  // débordait sur le soulignement. Il devient une icône discrète DANS le champ.
+  .panel input-password {
+    position: relative;
+    display: block;
+
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      height: auto;
+      padding-right: 3rem;
+    }
+
+    button,
+    button:hover,
+    button:active,
+    button:focus {
+      position: absolute;
+      top: 50%;
+      right: 0.3125rem;
+      transform: translateY(-50%);
+      width: 2.375rem;
+      height: 2.375rem;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    button:hover {
+      background: $lightest-grey;
+    }
+
+    button::before {
+      color: $dark-grey;
+      left: 0;
+      top: 50%;
+      width: 2.375rem;
+      margin-top: -0.6875rem;
+      font-size: 1.375rem;
+    }
+  }
+
+  // ---- Liens ---------------------------------------------------------------
+  .panel form a {
+    margin: 0;
+    font-size: 0.875rem;
+    color: darken($primary-base, 18%);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: darken($primary-base, 30%);
+    }
+
+    &:focus-visible {
+      outline: 2px solid darken($primary-base, 18%);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+
+  // ---- Message d'erreur ----------------------------------------------------
+  .panel p.warning,
+  .panel p.error {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: $auth-card-width;
+    margin: 0 auto 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    text-align: left;
+    color: darken($red, 22%);
+    background: lighten($red, 38%);
+    border: 1px solid lighten($red, 25%);
+    border-left: 4px solid $red;
+    border-radius: $auth-field-radius;
+  }
+}
+
+// =============================================================================
+// Page de connexion
+// =============================================================================
+body.auth-login {
+  .login.panel .panels-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 62rem;
+    min-height: 0;
+    margin: 0;
+    overflow: visible;
+  }
+
+  .login.panel .welcome-text {
+    display: block;
+    float: none;
+    max-width: 30rem;
+    min-width: 0;
+    min-height: 0;
+    text-align: left;
+
+    h1 {
+      display: block;
+      margin: 0 0 1rem;
+      font-size: 1.375rem;
+      line-height: 1.3;
+      text-align: left;
+      text-shadow: none;
+      color: darken($primary-base, 12%);
+    }
+
+    h2,
+    h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1.125rem;
+      color: $darkest-grey;
+    }
+
+    p {
+      font-size: 0.9375rem;
+      line-height: 1.55;
+    }
+  }
+
+  .login.panel .welcome-text + form,
+  .login.panel form {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  // Identifiants + actions
+  .login.panel form .flex-magnet-container {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 1rem;
+    margin-top: 0.25rem;
+
+    > .cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    > button {
+      width: 100%;
+      align-self: stretch;
+    }
+  }
+
+  .login.panel input#email {
+    width: 100%;
+    height: auto;
+    margin: 0;
+  }
+}
+
+// =============================================================================
+// Page « identifiant / mot de passe oublié »
+// =============================================================================
+body.auth-forgot {
+  .panel .content {
+    padding: 1.75rem;
+  }
+
+  .auth-intro {
+    margin: 0 0 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: 1.55;
+    color: $dark-grey;
+  }
+
+  // ---- Accordéon -----------------------------------------------------------
+  .auth-accordion {
+    box-sizing: border-box;
+    border: 1px solid $light-grey;
+    border-radius: $auth-field-radius;
+    overflow: hidden;
+
+    & + .auth-accordion {
+      margin-top: 0.75rem;
+    }
+  }
+
+  .auth-accordion__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 1rem 1.125rem;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-align: left;
+    text-transform: none;
+    color: $darkest-grey;
+    background: $lightest-grey;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      color: $darkest-grey;
+      background: $light-grey;
+      box-shadow: none;
+    }
+
+    &:focus-visible {
+      outline: 3px solid darken($primary-base, 10%);
+      outline-offset: -3px;
+    }
+
+    &::after {
+      content: "";
+      flex: 0 0 auto;
+      width: 0.625rem;
+      height: 0.625rem;
+      margin-right: 0.25rem;
+      border-right: 2px solid $dark-grey;
+      border-bottom: 2px solid $dark-grey;
+      transform: rotate(45deg) translate(-0.125rem, -0.125rem);
+      transition: transform 0.2s ease;
+    }
+
+    &[aria-expanded="true"] {
+      color: $white;
+      background: darken($primary-base, 10%);
+
+      &:hover {
+        background: darken($primary-base, 16%);
+      }
+
+      &::after {
+        border-color: $white;
+        transform: rotate(225deg) translate(-0.125rem, -0.125rem);
+      }
+    }
+  }
+
+  .auth-accordion__body {
+    box-sizing: border-box;
+    padding: 1.25rem 1.125rem 1.375rem;
+    background: $white;
+
+    > p,
+    > i18n {
+      display: block;
+      margin: 0 0 1rem;
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      color: $dark-grey;
+    }
+
+    // Les gabarits historiques s'appuient sur `float` + `overflow: hidden`
+    // (form.rowstyle) : une colonne flex supprime les débordements et rend
+    // l'espacement explicite.
+    form.nostyle,
+    form.rowstyle {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: visible;
+
+      > p,
+      > .row {
+        margin: 0;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      input[type="password"],
+      select {
+        width: 100%;
+        height: auto;
+        float: none;
+      }
+
+      input[type="submit"] {
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+
+  // ---- Retour à la connexion ----------------------------------------------
+  .auth-footer {
+    margin: 1.5rem 0 0;
+    text-align: center;
+
+    button,
+    a {
+      display: inline-block;
+      margin: 0;
+      padding: 0.5rem 0.25rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      text-transform: none;
+      color: darken($primary-base, 18%);
+      background: none;
+      border: none;
+      border-radius: 4px;
+      box-shadow: none;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+
+      &:hover {
+        color: darken($primary-base, 30%);
+        background: none;
+        box-shadow: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid darken($primary-base, 18%);
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  // Compatibilité : skins dont le gabarit `forgot-form.html` n'a pas été repris
+  // (hdf, monlycee, na, normandie, paris) — la barre de boutons reste centrée.
+  .panel .content > form.button-bar {
+    margin: 1.5rem 0 0;
+    padding-top: 0;
+    text-align: center;
+  }
+}
+
+// =============================================================================
+// Mobile
+// =============================================================================
+@media screen and (max-width: $tablette) {
+  body.auth-page {
+    background-attachment: scroll;
+
+    .panel {
+      min-height: 100vh;
+      padding: 2rem 1rem 2.5rem;
+
+      // `_panel.scss` masque le titre sous tablette : la composition centrée
+      // n'a plus de bandeau à compenser, on le garde et on le redimensionne.
+      > h1 {
+        display: block;
+        margin: 0 0 1.25rem;
+      }
+
+      > .logo {
+        height: 3.25rem;
+        margin-bottom: 1rem !important;
+      }
+
+      form:not(.nostyle),
+      .content,
+      .welcome-text,
+      .browser {
+        padding: 1.5rem 1.25rem;
+        border-radius: 14px;
+      }
+    }
+  }
+
+  body.auth-login .login.panel {
+    h1 + form,
+    .panels-container {
+      margin-top: 0;
+    }
+
+    .panels-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .welcome-text,
+    .welcome-text + form,
+    form {
+      width: 100%;
+      max-width: $auth-card-width;
+      margin: 0;
+    }
+  }
+
+  body.auth-forgot .auth-accordion__trigger {
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+  }
+}
+
+@media screen and (max-width: $small-mobile) {
+  body.auth-page .panel form:not(.nostyle),
+  body.auth-page .panel .content {
+    padding: 1.25rem 1rem;
+  }
+}

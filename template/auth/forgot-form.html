@@ -1,20 +1,36 @@
 <section class="main">
-  <div class="panel">
-		<img class="logo absolute" src="/assets/themes/[[childTheme]]/img/illustrations/logo.png" alt="Logo de l'ENT">
+  <div class="forgot panel">
+    <img
+      class="logo absolute"
+      src="/assets/themes/[[childTheme]]/img/illustrations/logo.png"
+      alt="Logo de l'ENT"
+    />
     <h1 translate content="auth.forgot.header"></h1>
-    <p class="warning" ng-if="error" translate content="[[error]]"></p>
+    <p class="warning" ng-if="error" role="alert" translate content="[[error]]"></p>
 
     <div class="content">
-      <h4><i18n>auth.forgot.text</i18n></h4>
+      <p class="auth-intro"><i18n>auth.forgot.text</i18n></p>
 
-      <h2
-        ng-click="showWhat = showWhat === 'forgotPassword' ? null : 'forgotPassword'"
-      >
-        <a><i18n>auth.lost.password</i18n></a>
-      </h2>
-      <div ng-if="showWhat === 'forgotPassword'" ng-init="user.mail = ''">
-        <p><i18n>auth.lost.password.text</i18n></p>
-        <div class="row">
+      <div class="auth-accordion">
+        <button
+          type="button"
+          class="auth-accordion__trigger"
+          id="forgot-password-trigger"
+          aria-controls="forgot-password-panel"
+          aria-expanded="[[showWhat === 'forgotPassword' ? 'true' : 'false']]"
+          ng-click="showWhat = showWhat === 'forgotPassword' ? null : 'forgotPassword'"
+        >
+          <i18n>auth.lost.password</i18n>
+        </button>
+        <div
+          class="auth-accordion__body"
+          id="forgot-password-panel"
+          role="region"
+          aria-labelledby="forgot-password-trigger"
+          ng-if="showWhat === 'forgotPassword'"
+          ng-init="user.mail = ''"
+        >
+          <p><i18n>auth.lost.password.text</i18n></p>
           <form
             class="nostyle rowstyle"
             method="post"
@@ -22,10 +38,15 @@
             ng-submit="forgotPassword(user.login, 'mail')"
           >
             <p>
-              <label translate content="auth.email"></label>
+              <label for="forgot-password-login" translate content="auth.email"></label>
               <input
                 type="text"
+                id="forgot-password-login"
                 name="login"
+                autocomplete="username"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
                 ng-keydown="noSpace($event)"
                 ng-change="noUpperCase()"
                 ng-model="user.login"
@@ -43,15 +64,26 @@
         </div>
       </div>
 
-      <h2 ng-click="showWhat = showWhat === 'forgotId' ? null : 'forgotId'">
-        <a><i18n>auth.lost.id</i18n></a>
-      </h2>
-      <div
-        ng-if="showWhat === 'forgotId'"
-        ng-init="user.login = ''; user.mode = 'id'"
-      >
-        <i18n>auth.lost.id.text</i18n>
-        <div class="row">
+      <div class="auth-accordion">
+        <button
+          type="button"
+          class="auth-accordion__trigger"
+          id="forgot-id-trigger"
+          aria-controls="forgot-id-panel"
+          aria-expanded="[[showWhat === 'forgotId' ? 'true' : 'false']]"
+          ng-click="showWhat = showWhat === 'forgotId' ? null : 'forgotId'"
+        >
+          <i18n>auth.lost.id</i18n>
+        </button>
+        <div
+          class="auth-accordion__body"
+          id="forgot-id-panel"
+          role="region"
+          aria-labelledby="forgot-id-trigger"
+          ng-if="showWhat === 'forgotId'"
+          ng-init="user.login = ''; user.mode = 'id'"
+        >
+          <p><i18n>auth.lost.id.text</i18n></p>
           <form
             class="nostyle rowstyle"
             method="post"
@@ -59,10 +91,15 @@
             ng-submit="forgot('mail')"
           >
             <p ng-if="shouldAskForPwd()">
-              <label translate content="auth.email"></label>
+              <label for="forgot-id-login" translate content="auth.email"></label>
               <input
                 type="text"
+                id="forgot-id-login"
                 name="login"
+                autocomplete="username"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
                 ng-keydown="noSpace($event)"
                 ng-change="noUpperCase()"
                 ng-model="user.login"
@@ -71,26 +108,35 @@
             </p>
 
             <p ng-if="shouldAskForEmail()">
-              <label translate content="auth.mail"></label>
-              <input type="email" name="mail" ng-model="user.mail" required />
-            </p>
-            <p ng-if="shouldAskForNameAndStructure()" class="row no-margin">
-              <label
-                translate
-                content="auth.info.firstName"
-                class="no-margin"
-              ></label>
+              <label for="forgot-id-mail" translate content="auth.mail"></label>
               <input
-                type="text"
-                name="firstName"
-                ng-model="user.firstName"
+                type="email"
+                id="forgot-id-mail"
+                name="mail"
+                autocomplete="email"
+                ng-model="user.mail"
                 required
-                class="no-margin"
               />
             </p>
             <p ng-if="shouldAskForNameAndStructure()">
-              <label translate content="auth.info.structure"></label>
+              <label
+                for="forgot-id-firstname"
+                translate
+                content="auth.info.firstName"
+              ></label>
+              <input
+                type="text"
+                id="forgot-id-firstname"
+                name="firstName"
+                autocomplete="given-name"
+                ng-model="user.firstName"
+                required
+              />
+            </p>
+            <p ng-if="shouldAskForNameAndStructure()">
+              <label for="forgot-id-structure" translate content="auth.info.structure"></label>
               <select
+                id="forgot-id-structure"
                 ng-options="structure.structureId as structure.structureName for structure in structures | orderBy: 'name'"
                 ng-model="user.structureId"
                 required
@@ -107,17 +153,9 @@
         </div>
       </div>
 
-      <form
-        class="row centered-text nostyle button-bar"
-        method="get"
-        action="/auth/login"
-      >
-        <button
-          class="right-magnet"
-          translate
-          content="auth.back.to.login"
-        ></button>
-      </form>
+      <div class="auth-footer">
+        <a href="/auth/login" translate content="auth.back.to.login"></a>
+      </div>
     </div>
   </div>
 </section>
