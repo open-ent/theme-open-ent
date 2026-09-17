@@ -1,9 +1,10 @@
 // =============================================================================
-// Écrans d'authentification (connexion / identifiant oublié)
+// Écrans d'authentification
 // -----------------------------------------------------------------------------
-// Portée : `body.auth-page` uniquement — classe posée par auth/view-src/login.html
-// et auth/view-src/forgot.html. Les autres pages qui partagent `body.login`
-// (activation, revalidation des CGU) ne sont PAS touchées.
+// Portée : `body.auth-page`, posée par les quatre vues de auth/view-src/ —
+// login.html (`auth-login`), forgot.html (`auth-forgot`),
+// activation.html (`auth-activation`) et revalidate-terms.html (`auth-terms`).
+// Les autres pages qui portent `body.login` sans `auth-page` ne sont pas touchées.
 //
 // Les couleurs dérivent de `$primary-base` / `$accent-base` (valeurs littérales) :
 // les teintes calculées ne peuvent pas partir de `$primary`, qui est une var() CSS
@@ -39,7 +40,6 @@ $auth-wide-width: 40rem; // 640px
       $primary-dark 52%,
       $primary-darkest 100%
     );
-  background-attachment: fixed;
 }
 
 body.auth-page {
@@ -68,13 +68,21 @@ body.auth-page {
     margin: 0;
   }
 
-  section.main {
+  section.main,
+  section.center-component {
     display: block;
     width: auto;
     max-width: none;
     min-width: 0;
     margin: 0;
     padding: 0;
+  }
+
+  > default-styles > .row {
+    display: block;
+    width: auto;
+    max-width: none;
+    margin: 0;
   }
 
   .panel {
@@ -265,7 +273,7 @@ body.auth-page {
   // Le thème masque la case native et dessine la boîte sur `small::before`
   // (cf. modules/_checkboxes-custom.scss). On garde le principe, mais la case
   // reste focalisable au clavier et prend la couleur de marque une fois cochée.
-  .panel form > label {
+  .panel form > label[for="rememberMe"] {
     display: flex;
     align-items: center;
     position: relative;
@@ -740,12 +748,190 @@ body.auth-forgot {
 }
 
 // =============================================================================
+// Activation de compte · revalidation des CGU
+// =============================================================================
+body.auth-activation,
+body.auth-terms {
+  // `_panel.scss` impose min-height: 500px et width: 90% au conteneur de cartes.
+  .panel .panels-container {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: $auth-card-width;
+    min-height: 0;
+    margin: 0;
+    overflow: visible;
+  }
+
+  // Acceptation de la charte / des CGU : case et texte sur une même ligne, la
+  // case gardant son rendu natif (elle n'est pas enveloppée dans un `label`,
+  // donc la case personnalisée de `_checkboxes-custom.scss` ne s'applique pas).
+  .auth-cgu {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    margin: 0 0 1.25rem;
+
+    input[type="checkbox"] {
+      display: block;
+      flex: 0 0 auto;
+      width: 1.125rem;
+      height: 1.125rem;
+      min-height: 0;
+      margin: 0.1875rem 0 0;
+      accent-color: darken($primary-base, 10%);
+    }
+
+    .auth-cgu__text,
+    label {
+      display: inline;
+      float: none;
+      margin: 0;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: $dark-grey;
+      cursor: pointer;
+    }
+
+    a {
+      display: inline;
+      font-size: inherit;
+    }
+  }
+
+  // Bouton principal pleine largeur, lien secondaire dessous — même schéma que
+  // le pied de formulaire de la page de connexion.
+  .auth-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.875rem;
+    margin-top: 1.5rem;
+
+    input[type="submit"],
+    button {
+      width: 100%;
+    }
+  }
+}
+
+body.auth-activation {
+  // Identifiant rappelé en tête de formulaire.
+  .auth-identity {
+    margin: 0 0 1.25rem;
+    padding: 0 0 1.125rem;
+    border-bottom: 1px solid $light-grey;
+
+    label {
+      margin: 0 0 0.125rem;
+    }
+
+    strong {
+      display: block;
+      font-size: 1.0625rem;
+      color: $darkest-grey;
+      word-break: break-word;
+    }
+  }
+
+  // Jauge de robustesse du mot de passe.
+  .complexity {
+    margin: -0.375rem 0 1.125rem;
+
+    small {
+      display: block;
+      margin-bottom: 0.375rem;
+      font-size: 0.8125rem;
+      color: $dark-grey;
+    }
+  }
+
+  .fill-bar {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: $light-grey;
+    overflow: hidden;
+
+    > div {
+      height: 100%;
+      border-radius: 999px;
+      background: $orange;
+      transition: width 0.2s ease, background-color 0.2s ease;
+
+      &.weak {
+        background: $red;
+      }
+
+      &.normal {
+        background: $orange;
+      }
+
+      &.strong {
+        background: $valid-color;
+      }
+    }
+  }
+
+  .input-errors {
+    margin: -0.5rem 0 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: darken($red, 12%);
+
+    label {
+      display: inline;
+      margin: 0;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      color: inherit;
+    }
+  }
+
+  // Champ téléphone international (directive intlPhoneInput).
+  [data-intl-phone-input],
+  .intl-tel-input {
+    width: 100%;
+  }
+}
+
+body.auth-terms {
+  // Seul gabarit des quatre à ne pas porter d'<img class="logo"> : son
+  // contrôleur n'expose pas `childTheme`. Le thème, lui, sait où est son logo —
+  // theme.css est en skins/<skin>/, le logo deux niveaux au-dessus.
+  .panel::before {
+    content: "";
+    display: block;
+    width: min(17.5rem, 72vw);
+    height: 4rem;
+    margin: 0 auto 1.25rem;
+    background: url("../../img/illustrations/logo.png") center / contain
+      no-repeat;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+  }
+
+  .panel form {
+    h2 {
+      margin: 0 0 1rem;
+      font-size: 1.25rem;
+      line-height: 1.3;
+      color: $darkest-grey;
+    }
+
+    > p {
+      margin: 0 0 1rem;
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      color: $dark-grey;
+    }
+  }
+}
+
+// =============================================================================
 // Mobile
 // =============================================================================
 @media screen and (max-width: $tablette) {
   body.auth-page {
-    background-attachment: scroll;
-
     .panel {
       min-height: 100vh;
       padding: 2rem 1rem 2.5rem;
