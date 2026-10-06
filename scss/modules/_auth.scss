@@ -904,6 +904,19 @@ body.auth-reset {
     }
   }
 
+  // `_panel.scss` annule la marge du dernier `<p>` de `resetForm` — du temps où il
+  // enveloppait le bouton. Ce dernier paragraphe est désormais un champ ou un
+  // message : sans sa marge, la jauge se colle au champ de confirmation.
+  form[name="resetForm"] p:last-of-type {
+    margin: 0 0 1.125rem;
+    // `overflow: hidden` y rognait aussi le halo de focus du champ.
+    overflow: visible;
+
+    &.input-errors {
+      margin: -0.5rem 0 1rem;
+    }
+  }
+
   // Champ téléphone international (directive intlPhoneInput).
   [data-intl-phone-input],
   .intl-tel-input {
