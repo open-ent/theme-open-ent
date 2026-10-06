@@ -1,9 +1,10 @@
 // =============================================================================
 // Écrans d'authentification
 // -----------------------------------------------------------------------------
-// Portée : `body.auth-page`, posée par les quatre vues de auth/view-src/ —
+// Portée : `body.auth-page`, posée par les cinq vues de auth/view-src/ —
 // login.html (`auth-login`), forgot.html (`auth-forgot`),
-// activation.html (`auth-activation`) et revalidate-terms.html (`auth-terms`).
+// activation.html (`auth-activation`), reset.html (`auth-reset`) et
+// revalidate-terms.html (`auth-terms`).
 // Les autres pages qui portent `body.login` sans `auth-page` ne sont pas touchées.
 //
 // Les couleurs dérivent de `$primary-base` / `$accent-base` (valeurs littérales) :
@@ -190,6 +191,14 @@ body.auth-page {
   .panel .content,
   .panel .browser {
     max-width: $auth-wide-width;
+  }
+
+  // `_panel.scss` pose `margin: auto !important` sur `.panel.activation form`.
+  // Dans la colonne flex, ces marges automatiques absorbent l'espace libre : la
+  // carte se détache du titre dès que le formulaire est plus court que la
+  // fenêtre (nouveau mot de passe, sur mobile notamment).
+  .panel.activation > form:not(.nostyle) {
+    margin: 0 !important;
   }
 
   .panel .teacher-request-sent {
@@ -428,6 +437,11 @@ body.auth-page {
     }
 
     button::before {
+      // Sous tablette, une règle héritée la repasse en `position: relative` :
+      // `top: 50%` ne se résout plus et l'icône glisse sous le champ.
+      position: absolute;
+      height: auto;
+      line-height: 1;
       color: $dark-grey;
       left: 0;
       top: 50%;
@@ -748,9 +762,10 @@ body.auth-forgot {
 }
 
 // =============================================================================
-// Activation de compte · revalidation des CGU
+// Activation de compte · nouveau mot de passe · revalidation des CGU
 // =============================================================================
 body.auth-activation,
+body.auth-reset,
 body.auth-terms {
   // `_panel.scss` impose min-height: 500px et width: 90% au conteneur de cartes.
   .panel .panels-container {
@@ -816,7 +831,8 @@ body.auth-terms {
   }
 }
 
-body.auth-activation {
+body.auth-activation,
+body.auth-reset {
   // Identifiant rappelé en tête de formulaire.
   .auth-identity {
     margin: 0 0 1.25rem;
