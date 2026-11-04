@@ -1,0 +1,10 @@
+{
+  "_comment": "Gabarit front et niveaux servis, repris dans theme.json par package-theme.sh.",
+  "bootstrapVersion": "ode-bootstrap-neo",
+  "help": "/help-2d",
+  "schoolLevels": [
+    "college",
+    "lycee",
+    "lycee_pro"
+  ]
+}

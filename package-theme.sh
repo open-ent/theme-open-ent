@@ -87,6 +87,21 @@ if [[ -f "$META_FILE" ]]; then
     [[ -n "$(value_of help)" ]] && HELP_PATH="$(value_of help)"
 fi
 
+# Niveaux servis par l'ENT (`schoolLevels`, liste) et thème par niveau (`levelThemes`, objet) :
+# des valeurs JSON, recopiées telles quelles dans le manifeste. Le portail les lit dans
+# themes/<skin>/theme.json pour choisir le thème de chaque usager et annoncer les niveaux aux
+# applications. Absentes, le thème garde le comportement d'avant (un seul thème par adresse).
+META_EXTRA=""
+if [[ -f "$META_FILE" ]]; then
+    META_EXTRA="$(python3 -c '
+import json, sys
+meta = json.load(open(sys.argv[1], encoding="utf-8"))
+for key in ("schoolLevels", "levelThemes"):
+    if key in meta:
+        print("  \"%s\": %s," % (key, json.dumps(meta[key], ensure_ascii=False)))
+' "$META_FILE")"
+fi
+
 SKINS_JSON="[]"
 if [[ -d "$DIST_DIR/skins" ]]; then
     SKINS_JSON="$(find "$DIST_DIR/skins" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
@@ -107,6 +122,7 @@ cat > "$STAGE/theme.json" <<JSON
   "themeOpenEntSha": "$THEME_SHA",
   "bootstrapVersion": "$BOOTSTRAP_VERSION",
   "help": "$HELP_PATH",
+$META_EXTRA
   "skins": $SKINS_JSON
 }
 JSON

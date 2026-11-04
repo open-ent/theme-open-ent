@@ -1,5 +1,9 @@
 {
   "_comment": "cd16 est un déploiement 1d servi par le bootstrap neo — c'est la conf historique de theme-conf.js, reprise telle quelle.",
   "bootstrapVersion": "ode-bootstrap-neo",
-  "help": "/help-1d"
+  "help": "/help-1d",
+  "schoolLevels": [
+    "maternelle",
+    "elementaire"
+  ]
 }
