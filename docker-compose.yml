@@ -1,6 +1,12 @@
 services:
   node:
-    image: "opendigitaleducation/node:18-alpine-pnpm"
+    # node:26 (Debian, avec git pour les dépendances github:) n'embarque plus corepack :
+    # le point d'entrée installe pnpm (9.15.0, celui de l'ancienne image ODE *-pnpm).
+    image: "node:26"
+    entrypoint: ["sh", "-c", "npm i -g pnpm@9.15.0 >/dev/null 2>&1 && exec \"$$@\"", "--"]
+    environment:
+      - NPM_CONFIG_PREFIX=/tmp/npm-global
+      - PATH=/tmp/npm-global/bin:/usr/local/bin:/usr/bin:/bin
     user: "node"
     working_dir: /home/node/app
     network_mode: host

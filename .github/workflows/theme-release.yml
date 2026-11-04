@@ -157,6 +157,12 @@ jobs:
         with:
           version: 9
 
+      # Node du runner pour entcore-css-lib (le thème, lui, se construit dans le conteneur
+      # node:26 de docker-compose.yml).
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+
       - name: Construire entcore-css-lib
         working-directory: entcore-css-lib
         run: |
