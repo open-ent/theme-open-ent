@@ -1,0 +1,468 @@
+// =============================================================================
+// Écrans d'authentification — identité « ENT Scolaire »
+// -----------------------------------------------------------------------------
+// Couche optionnelle posée PAR-DESSUS `modules/_auth.scss`, qui reste la base
+// commune à tous les skins. Elle n'est émise que si le skin demande cette
+// identité dans son `overrides/<skin>/css/_overridable-variables.scss` :
+//
+//     $auth-identity: "ent-scolaire";
+//
+// Tout autre skin (cd16, eclat-bfc, occitanie, openent1d…) compile un fichier
+// strictement inchangé : le `@if` ci-dessous n'émet alors aucune règle.
+//
+// Raison d'être : la vitrine publique servie sur `/` (portal-mui, `discover-*.html`)
+// et les pages nginx de maintenance et d'erreur portent la charte « ENT Scolaire »
+// — bleu #2160d8, orange #ff6a3d, Space Grotesk + Onest, cartes à grand rayon.
+// Les écrans d'authentification, eux, sont habillés par le thème : sans cette
+// couche, « Se connecter » fait changer de charte au visiteur.
+//
+// Les valeurs reprennent les jetons de `specification-design/page de garde/
+// styles.css` (`:root`), afin que les deux surfaces restent alignées.
+// =============================================================================
+
+$auth-identity: "default" !default;
+
+@if $auth-identity == "ent-scolaire" {
+  // ---- Jetons de la charte --------------------------------------------------
+  $es-ink: #15223d; // titres, texte fort
+  $es-ink-2: #48526c; // texte courant
+  $es-ink-3: #7e879c; // texte secondaire, mentions
+  $es-bg: #ffffff; // surface des cartes
+  $es-soft: #f4f7fc; // fond de page
+  $es-soft-2: #eaf0fa; // survol discret
+  $es-blue: #2160d8; // couleur primaire
+  $es-blue-d: #1a4eb5; // primaire foncée (liens, focus)
+  $es-accent: #ff6a3d; // appel à l'action
+  $es-accent-d: #e9522a; // appel à l'action, survol
+  $es-line: #e5ebf4; // filets
+  $es-line-2: #d6deec; // bordures de champ
+  $es-radius-lg: 22px; // cartes
+  $es-radius: 14px; // blocs internes
+  $es-radius-sm: 12px; // champs et boutons
+  $es-shadow-lg: 0 12px 40px rgba(20, 35, 65, 0.12);
+  $es-heading: "Space Grotesk", "Onest", sans-serif;
+  $es-body: "Onest", -apple-system, system-ui, sans-serif;
+
+  // ---- Polices --------------------------------------------------------------
+  // Hébergées par le thème (`overrides/openent3/fonts/`) et non appelées sur
+  // fonts.googleapis.com : l'écran de connexion ne doit dépendre d'aucun tiers,
+  // et la CSP du portail n'a pas à être élargie pour lui. Fichiers variables :
+  // une seule ressource couvre tout l'axe de graisse.
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("../../fonts/spacegrotesk-latin.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+      U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+      U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk";
+    src: url("../../fonts/spacegrotesk-latin-ext.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+      U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+      U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F,
+      U+A720-A7FF;
+  }
+
+  @font-face {
+    font-family: "Onest";
+    src: url("../../fonts/onest-latin.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+      U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+      U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+
+  @font-face {
+    font-family: "Onest";
+    src: url("../../fonts/onest-latin-ext.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+      U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+      U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F,
+      U+A720-A7FF;
+  }
+
+  // ---- Fond de page ---------------------------------------------------------
+  // `_auth.scss` peint un dégradé de marque sombre (mixin `auth-backdrop`) sur
+  // `body.auth-page` ET sur `.panel`. Les deux sont repris ici.
+  body.auth-page,
+  body.auth-page .panel {
+    background-color: $es-soft;
+    background-image: radial-gradient(
+        68rem 32rem at 78% -12%,
+        #e8f1fd 0%,
+        transparent 60%
+      ),
+      radial-gradient(50rem 30rem at 6% 8%, #fdeee8 0%, transparent 55%);
+  }
+
+  body.auth-page {
+    font-family: $es-body;
+    color: $es-ink-2;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+
+    // ---- Logo ---------------------------------------------------------------
+    // Le bloc-marque est une image large (mark + mot-logo) : on raisonne en
+    // hauteur et on laisse `object-fit: contain` faire le reste. L'ombre portée
+    // de `_auth.scss` est retirée : sur fond clair elle salit le mot-logo.
+    .panel > .logo {
+      height: 3.25rem;
+      max-width: min(20rem, 76vw);
+      margin: 0 auto 1.75rem !important;
+      filter: none;
+    }
+
+    // ---- Titre de page ------------------------------------------------------
+    .panel h1 {
+      font-family: $es-heading;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      color: $es-ink;
+      text-shadow: none;
+    }
+
+    // Texte d'accroche hors carte.
+    .panel > p:not(.warning):not(.error),
+    .panel
+      > div:not(.panels-container):not(.content):not(.welcome-text):not(.browser)
+      > p:not(.warning):not(.error) {
+      color: $es-ink-2;
+      text-shadow: none;
+    }
+
+    // ---- Cartes -------------------------------------------------------------
+    .panel form:not(.nostyle),
+    .panel .content,
+    .panel .welcome-text,
+    .panel .browser,
+    .panel .teacher-request-sent {
+      background: $es-bg;
+      border: 1px solid $es-line;
+      border-radius: $es-radius-lg;
+      box-shadow: $es-shadow-lg;
+    }
+
+    // Les titres DANS une carte : même famille, taille de contenu.
+    .panel .content h1,
+    .panel .welcome-text h1,
+    .panel form h1 {
+      font-family: $es-heading;
+      letter-spacing: -0.03em;
+      color: $es-ink;
+    }
+
+    .panel .teacher-request-sent p {
+      color: $es-ink-2;
+    }
+
+    // ---- Champs -------------------------------------------------------------
+    .panel label {
+      color: $es-ink;
+      font-weight: 600;
+    }
+
+    .panel input[type="text"],
+    .panel input[type="email"],
+    .panel input[type="password"],
+    .panel input[type="tel"],
+    .panel select {
+      color: $es-ink;
+      border: 1px solid $es-line-2;
+      border-radius: $es-radius-sm;
+      font-family: inherit;
+
+      &:hover {
+        border-color: darken($es-line-2, 10%);
+      }
+
+      &:focus {
+        border-color: $es-blue;
+        box-shadow: 0 0 0 3px rgba(33, 96, 216, 0.18);
+      }
+    }
+
+    // ---- Case à cocher ------------------------------------------------------
+    .panel form > label[for="rememberMe"] {
+      color: $es-ink-2;
+
+      input:is([type="checkbox"], #rememberMe) + small::before {
+        border-color: $es-line-2;
+        border-radius: 6px;
+      }
+
+      input:is([type="checkbox"], #rememberMe):checked + small::before {
+        border-color: $es-blue;
+        background-color: $es-blue;
+      }
+
+      input:is([type="checkbox"], #rememberMe):focus-visible + small::before {
+        border-color: $es-blue;
+        box-shadow: 0 0 0 3px rgba(33, 96, 216, 0.22);
+      }
+    }
+
+    // ---- Bouton principal ---------------------------------------------------
+    // Orange de la charte, comme le « Tester maintenant » de la vitrine.
+    // La vitrine pose `font-family: inherit` sur `.btn` : les boutons sont en
+    // Onest, Space Grotesk restant réservé aux titres.
+    .panel form button,
+    .panel form input[type="submit"] {
+      font-family: $es-body;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
+      background: $es-accent;
+      border-radius: $es-radius-sm;
+      box-shadow: 0 6px 18px -5px rgba(255, 106, 61, 0.55);
+
+      &:hover {
+        color: #fff;
+        background: $es-accent-d;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 26px -6px rgba(255, 106, 61, 0.6);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px -5px rgba(255, 106, 61, 0.55);
+      }
+
+      &:focus-visible {
+        outline: 3px solid $es-blue;
+        outline-offset: 2px;
+      }
+
+      &[disabled="disabled"],
+      &:disabled {
+        color: $es-ink-3;
+        background: $es-soft-2;
+        box-shadow: none;
+        transform: none;
+      }
+    }
+
+    // Le bouton « voir le mot de passe » n'est pas un appel à l'action : il
+    // reste une icône dans le champ, que la règle ci-dessus repeindrait.
+    // `transform` doit rester `translateY(-50%)` : c'est lui qui centre l'œil
+    // sur le champ (`_auth.scss` le pose avec `top: 50%`). Un `transform: none`
+    // destiné à annuler le soulèvement au survol le décalerait d'une demi-hauteur
+    // vers le bas, visiblement sur le filet inférieur du champ.
+    .panel input-password button,
+    .panel input-password button:hover,
+    .panel input-password button:active,
+    .panel input-password button:focus {
+      background: transparent;
+      box-shadow: none;
+      transform: translateY(-50%);
+      border-radius: 8px;
+    }
+
+    .panel input-password button:hover {
+      background: $es-soft;
+    }
+
+    // La règle de bouton ci-dessus impose une famille de texte, dont le
+    // pseudo-élément hérite : l'œil, qui est un caractère de la fonte d'icônes
+    // (zone privée Unicode), retombait alors en carré vide. On la lui rend.
+    .panel input-password button::before {
+      font-family: "generic-icons";
+      color: $es-ink-3;
+    }
+
+    // ---- Liens --------------------------------------------------------------
+    .panel form a {
+      color: $es-blue-d;
+
+      &:hover {
+        color: $es-blue;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $es-blue;
+      }
+    }
+
+    // ---- Message d'erreur ---------------------------------------------------
+    .panel p.warning,
+    .panel p.error {
+      border-radius: $es-radius;
+    }
+  }
+
+  // ---- Page de connexion ----------------------------------------------------
+  body.auth-login {
+    .login.panel .welcome-text h1 {
+      color: $es-ink;
+    }
+
+    .login.panel .welcome-text h2,
+    .login.panel .welcome-text h3 {
+      font-family: $es-heading;
+      letter-spacing: -0.03em;
+      color: $es-ink;
+    }
+
+    // Lien « Créer un compte » : le filet du gabarit (`login-form.html`, bloc
+    // <style> embarqué) est tracé en rgba noir, invisible sur la carte claire.
+    .login.panel .register-link {
+      border-top-color: $es-line;
+      color: $es-ink-2;
+    }
+
+    .login.panel .register-link a {
+      color: $es-blue-d;
+    }
+
+    // Pied de page « Open ENT <version> · mis à jour le … ». Le gabarit le peint
+    // en blanc translucide, pensé pour le fond de marque sombre : illisible ici.
+    .platform-version {
+      color: $es-ink-3;
+    }
+  }
+
+  // ---- Page « identifiant / mot de passe oublié » ---------------------------
+  body.auth-forgot {
+    .auth-intro {
+      color: $es-ink-2;
+    }
+
+    .auth-accordion {
+      border-color: $es-line;
+      border-radius: $es-radius;
+    }
+
+    .auth-accordion__trigger {
+      color: $es-ink;
+      background: $es-soft;
+
+      &:hover {
+        color: $es-ink;
+        background: $es-soft-2;
+      }
+
+      &:focus-visible {
+        outline-color: $es-blue;
+      }
+
+      &::after {
+        border-color: $es-ink-3;
+      }
+
+      &[aria-expanded="true"] {
+        color: #fff;
+        background: $es-blue;
+
+        &:hover {
+          background: $es-blue-d;
+        }
+
+        &::after {
+          border-color: #fff;
+        }
+      }
+    }
+
+    .auth-accordion__body > p,
+    .auth-accordion__body > i18n {
+      color: $es-ink-2;
+    }
+  }
+
+  // ---- Retour à la connexion ------------------------------------------------
+  // Présent sur « oubli », activation et CGU, hors de tout formulaire : la règle
+  // de lien plus haut, portée par `.panel form a`, ne l'atteint pas.
+  body.auth-page .auth-footer a {
+    color: $es-blue-d;
+
+    &:hover {
+      color: $es-blue;
+    }
+
+    &:focus-visible {
+      outline-color: $es-blue;
+    }
+  }
+
+  // ---- Activation, nouveau mot de passe, revalidation des CGU ---------------
+  body.auth-activation,
+  body.auth-reset,
+  body.auth-terms {
+    // Cases à cocher natives des CGU (pas de case dessinée ici).
+    .auth-cgu input[type="checkbox"] {
+      accent-color: $es-blue;
+    }
+
+    // Le texte de consentement est du texte courant, pas un intitulé de champ :
+    // la règle `label` plus haut (encre, 600) le durcirait, à spécificité égale.
+    .auth-cgu .auth-cgu__text,
+    .auth-cgu label {
+      font-weight: 400;
+      color: $es-ink-2;
+    }
+
+    .auth-identity {
+      border-bottom-color: $es-line;
+    }
+
+    .auth-identity strong {
+      color: $es-ink;
+    }
+
+    .complexity small {
+      color: $es-ink-2;
+    }
+
+    .fill-bar {
+      background: $es-soft-2;
+    }
+  }
+
+  // L'écran de CGU n'a pas d'<img> : son logo est un fond de pseudo-élément.
+  // Même traitement que l'image — pas d'ombre portée sur fond clair.
+  body.auth-terms .panel::before {
+    filter: none;
+  }
+
+  body.auth-terms .panel form h2,
+  body.auth-terms .panel form > p {
+    color: $es-ink-2;
+  }
+
+  body.auth-terms .panel form h2 {
+    font-family: $es-heading;
+    letter-spacing: -0.03em;
+    color: $es-ink;
+  }
+
+  // ---- Mobile ---------------------------------------------------------------
+  // `_auth.scss` resserre les cartes sous tablette ; ces règles-ci étant
+  // postérieures, elles doivent reprendre la consigne, sans quoi le rayon de
+  // 22 px s'appliquerait aussi au petit écran. 18 px est la valeur retenue par
+  // les pages de maintenance et d'erreur de la même charte.
+  @media screen and (max-width: $tablette) {
+    body.auth-page .panel > .logo {
+      margin-bottom: 1rem !important;
+    }
+
+    body.auth-page .panel form:not(.nostyle),
+    body.auth-page .panel .content,
+    body.auth-page .panel .welcome-text,
+    body.auth-page .panel .browser {
+      border-radius: 18px;
+    }
+  }
+}
