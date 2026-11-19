@@ -7,14 +7,28 @@ services:
     environment:
       - NPM_CONFIG_PREFIX=/tmp/npm-global
       - PATH=/tmp/npm-global/bin:/usr/local/bin:/usr/bin:/bin
+      # HOME hors de /home/node, pour la même raison que `working_dir` ci-dessous :
+      # npm et pnpm y écrivent leurs caches et git y lit sa configuration globale.
+      # /tmp et non un sous-répertoire : Docker crée en root les points de montage
+      # manquants, et un HOME en root ramènerait l'erreur de droits ailleurs.
+      - HOME=/tmp
     user: "node"
-    working_dir: /home/node/app
+    # Rien sous /home/node : dans l'image Debian node:26 ce répertoire est en 700,
+    # propriété de l'utilisateur `node` (1000). Or `build.sh` lance le conteneur avec
+    # `-u $(id -u):$(id -g)` : tout UID autre que 1000 — celui des runners GitHub est
+    # 1001 — ne peut même pas traverser /home/node, et pnpm échoue en
+    # `EACCES: permission denied, scandir '/home/node/app'`. L'ancienne image alpine
+    # d'ODE laissait ce répertoire traversable, d'où un défaut invisible jusqu'au
+    # premier build exécuté hors d'un poste en UID 1000.
+    working_dir: /app
     network_mode: host
     volumes:
-      - ./:/home/node/app
+      - ./:/app
       - ~/.pnpm:/.pnpm
       - ~/.npm:/.npm
       - ~/.cache:/.cache
-      - ../entcore-css-lib:/home/node/entcore-css-lib
-      - ~/.gitconfig:/home/node/.gitconfig
-      - ../recette:/home/node/recette
+      # `initDev` réécrit la dépendance en `link:../entcore-css-lib/`, résolu depuis
+      # /app : le voisinage des deux dépôts doit être reproduit à la racine.
+      - ../entcore-css-lib:/entcore-css-lib
+      - ~/.gitconfig:/tmp/.gitconfig
+      - ../recette:/recette
