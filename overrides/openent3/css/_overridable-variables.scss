@@ -5,11 +5,3 @@
 $primary: #1565C0;
 $accent:  #FFB300;
 $hover:   $accent;
-
-// Identité des écrans d'authentification.
-// « ent-scolaire » aligne /auth/* sur la charte de la vitrine publique servie
-// sur `/` (portal-mui, discover-*.html) et des pages nginx de maintenance :
-// bleu #2160d8, orange #ff6a3d, Space Grotesk + Onest, cartes à grand rayon.
-// Sans cette ligne, les écrans gardent l'habillage de marque commun à tous les
-// skins (cf. scss/modules/_auth-ent-scolaire.scss).
-$auth-identity: "ent-scolaire";

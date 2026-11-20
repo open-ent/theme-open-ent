@@ -25,9 +25,3 @@
 @import "specifics/";
 @import "./springboard-overrides.scss";
 @import "./product-overrides.scss";
-
-/* IDENTITÉ DES ÉCRANS D'AUTHENTIFICATION */
-// En dernier, pour passer après `modules/_auth.scss` et après les surcharges
-// produit : à spécificité égale, c'est l'ordre qui tranche. N'émet des règles
-// que si le skin a demandé `$auth-identity` (cf. le fichier lui-même).
-@import "./modules/auth-ent-scolaire";
