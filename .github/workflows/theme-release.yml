@@ -155,7 +155,7 @@ jobs:
       - name: Installer pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 12
 
       # Node du runner pour entcore-css-lib (le thème, lui, se construit dans le conteneur
       # node:26 de docker-compose.yml).
